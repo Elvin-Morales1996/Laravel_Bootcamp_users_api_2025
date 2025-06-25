@@ -5,3 +5,5 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::apiResource('usuario', UsuarioController::class);
+Route::post('/usuario/filtro', [UsuarioController::class, 'filter']);
+
