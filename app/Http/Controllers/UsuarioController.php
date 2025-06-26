@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UsuarioController extends Controller
 {
@@ -49,17 +50,25 @@ class UsuarioController extends Controller
          * admin, usuario, lector, etc...
          * $user = Usuario::where('id',$id)->where('status','=','1')->first();
          */
-        $user = Usuario::where('id',$id)->first();
-        if (!$user) {
-            return response()->json([
-                'message'=>'usuario no existe con ese id'
-            ],404);
 
-        }
+   try {
+        $user = Usuario::where('id', $id)
+                       ->where('status', '1')
+                       ->firstOrFail();
+
         return response()->json([
-            'message'=>$user
-        ],200);
+            'message' => $user
+        ], 200);
+
+    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        return response()->json([
+            'status' => false,
+            'message' => 'Usuario no encontrado o está inactivo',
+            'code' => 404
+        ], 404);
     }
+}
+
 
 
      //editar un usuario con id
