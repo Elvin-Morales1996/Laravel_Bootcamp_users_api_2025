@@ -6,6 +6,10 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Mockery\Generator\StringManipulation\Pass\Pass;
+use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
+use Exception;
 
 class UsuarioController extends Controller
 {
@@ -25,6 +29,23 @@ class UsuarioController extends Controller
     public function store(Request $request)
     {
         //
+        $request->validate([
+        //validacion de los campos  
+        'nombre'=>'required|string|max:255',
+        'apellido'=>'required|string|max:255',
+        'email'=>'required|email|unique:usuarios,email',
+        //una manera de hacerlo
+        /*'password'=>[
+            'required',
+            'string',
+            Password::min(8)->mixedCase()->numbers()->symbols()
+            ]*/
+
+            'password'=>'required|string|min:8|regex:/[a-z]/|regex:/[A-Z]/|regex:/[0-9]/|regex:/[@$!%*?&]/'
+        
+        ]);
+
+
         $user = Usuario::create([
             'nombre'=>$request->nombre,
             'apellido'=>$request->apellido,
