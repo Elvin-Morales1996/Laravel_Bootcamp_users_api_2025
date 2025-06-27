@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Mockery\Generator\StringManipulation\Pass\Pass;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
+
 use Exception;
 
 class UsuarioController extends Controller
@@ -28,6 +30,9 @@ class UsuarioController extends Controller
 
     public function store(Request $request)
     {
+        try {
+            //code...
+        
         //
         $request->validate([
         //validacion de los campos  
@@ -59,6 +64,25 @@ class UsuarioController extends Controller
             'message'=>'usuario creado conexito',
             'data'=>$user
         ],201);
+
+        //validar validaciones de errores
+        } catch (ValidationException $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Error de validación',
+                'error' => $e->errors()
+            ], 422);
+        } 
+        
+        
+        catch (Exception $t) {
+            Log::error('error al crear el usuario: '.$t->getMessage());
+            return response()->json([
+                'status' => false,
+                'message' => 'Internal_Server_Error',
+                'error' => $t->getMessage(),
+            ], 500);
+        }
 
     }
 
