@@ -6,11 +6,10 @@ use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Mockery\Generator\StringManipulation\Pass\Pass;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
-
 use Exception;
 
 class UsuarioController extends Controller
@@ -21,11 +20,24 @@ class UsuarioController extends Controller
     public function index()
     {
         //
+        try{
         $usuario = Usuario::all();
         return response()->json([
             'message'=>'listas de usuarios',
             'data'=>$usuario
-        ]);
+        ],200);
+    }catch(\Throwable $th){
+        if (env('APP_PRODUCTION',true)) return response()->json([
+            'message'=>'ocurrio un error verifique la informacion o vuelva a intentarlo mas tarde '
+        ],500);
+        return response()->json([
+            'message'=>'ocurrio un error',
+            'error'=>$th->getMessage(),
+            'trace'=>$th->getTrace(),
+        ],500);
+          
+        }
+    
     }
 
     public function store(Request $request)
