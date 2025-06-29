@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Helper;
 use App\Models\Usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +12,7 @@ use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Log;
 use Exception;
+use PHPUnit\TextUI\Help;
 
 class UsuarioController extends Controller
 {
@@ -70,6 +72,10 @@ class UsuarioController extends Controller
             'password'=>Hash::make($request->password),
             'status'=>$request->status
         ]);
+
+        if(!$user->save()) throw new \Exception('Error al guardar el usuario');
+        if(env('DB_LOGS',true)) Helper::logs($request, $user->id, 'CREATE', $user->id, 'usuarios');   
+        
 
         //mostrar usuario creado y mostrar el usuario nuevo
         return response()->json([
