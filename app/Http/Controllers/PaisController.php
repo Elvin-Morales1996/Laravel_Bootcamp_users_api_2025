@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Pais\RegisterRequest;
+use App\Http\Requests\Pais\UpdateRequest;
 use App\Models\Pais;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -59,9 +61,25 @@ class PaisController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(RegisterRequest $request)
     {
-        //
+        try {
+            DB::beginTransaction();
+            $request->validated();
+            $pais = new Pais([
+                'nombre' => $request->nombre,
+                
+            ]);
+            $pais->save();
+            DB::commit();
+            return response()->json([
+                'message' => 'País creado correctamente',
+                'data' => $pais
+            ], 201);
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return $this->handleError($th);
+        }
     }
 
     /**
